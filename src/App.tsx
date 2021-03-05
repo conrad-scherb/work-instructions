@@ -1,7 +1,7 @@
 import React from 'react';
-import './App.css';
+import './styles/App.css';
 import "./styles/tailwind.output.css"
-import MainContainer from './MainContainer'
+import MainContainer from './containers/MainContainer'
 
 function App() {
   return (

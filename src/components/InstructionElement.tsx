@@ -1,6 +1,5 @@
 import React from 'react';
-import "./styles/tailwind.output.css"
-import firebase from "./Firebase"
+import "../styles/tailwind.output.css"
 
 class InstructionElement extends React.Component<any, any> {
   constructor(props: any) {
@@ -12,7 +11,7 @@ class InstructionElement extends React.Component<any, any> {
 
   render() {
     return(
-      <></>
+      <div></div>
     )
   }
 }

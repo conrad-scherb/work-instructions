@@ -1,5 +1,5 @@
 import React from 'react';
-import "./styles/tailwind.output.css"
+import "../styles/tailwind.output.css"
 
 class RoleSelector extends React.Component<any, any> {
   constructor(props: any) {

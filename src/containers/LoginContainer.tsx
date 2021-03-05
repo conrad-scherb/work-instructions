@@ -1,5 +1,5 @@
 import React from 'react';
-import "./styles/tailwind.output.css"
+import "../styles/tailwind.output.css"
 
 class LoginContainer extends React.Component<any, any> {
   constructor(props: any) {

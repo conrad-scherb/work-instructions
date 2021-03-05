@@ -1,8 +1,8 @@
 import React from 'react';
 import HeaderContainer from './HeaderContainer';
 import LoginContainer from './LoginContainer';
-import RoleSelector from './RoleSelector';
-import "./styles/tailwind.output.css"
+import RoleSelector from '../forms/RoleSelector';
+import "../styles/tailwind.output.css"
 
 class MainContainer extends React.Component<any, any> {
   constructor(props: any) {

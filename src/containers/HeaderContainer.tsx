@@ -1,6 +1,6 @@
 import React from 'react';
-import "./styles/tailwind.output.css"
-import firebase from "./Firebase"
+import "../styles/tailwind.output.css"
+import firebase from "../firebase/Firebase"
 
 class HeaderContainer extends React.Component<any, any> {
   constructor(props: any) {
