@@ -11,7 +11,8 @@ class MainContainer extends React.Component<any, any> {
       loggedIn: false,
       password: '',
       branch: '',
-      role: ''
+      role: '',
+      instrTarget: ''
     };
 
     this.handlePwChange = this.handlePwChange.bind(this);
@@ -44,7 +45,7 @@ class MainContainer extends React.Component<any, any> {
   }
 
   handleInstrGet(event: any) {
-    console.log(this.state.role.value+this.state.branch.value)
+    this.setState({instrTarget: this.state.branch.value+this.state.role.value})
     event.preventDefault()
   }
 
@@ -65,7 +66,9 @@ class MainContainer extends React.Component<any, any> {
             onBranchChange={this.handleBranchChange}
             onRoleChange={this.handleRoleChange}
           />
-          <HeaderContainer/>
+          <HeaderContainer
+            instrTarget={this.state.instrTarget}
+          />
         </div>
       )
     }

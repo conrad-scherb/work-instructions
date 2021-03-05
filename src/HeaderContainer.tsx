@@ -8,36 +8,48 @@ class HeaderContainer extends React.Component<any, any> {
     this.state = {
       headers: []
     };
+
   }
 
+  pullFirebase() {
+    if (this.props.instrTarget !== '') {
+      const selectionRef = firebase.database().ref(this.props.instrTarget)
+      selectionRef.on('value', (snapshot) => {
+        let unsortedHeadings = Object.keys(snapshot.val())
+        let sortedHeadings = []
+
+        // Heading sorter
+        for (const heading of unsortedHeadings) {
+          if (heading[2] !== "@") {
+            sortedHeadings.push(heading.replace("@", "."))
+          }
+        }
+
+        for (const heading of unsortedHeadings) {
+          if (!sortedHeadings.includes(heading.replace("@", "."))) {
+            sortedHeadings.push(heading.replace("@", "."))
+          }
+        }
+
+        this.setState({headers: sortedHeadings})
+      })
+    }
+  }
+
+  // Mounting the container for headers triggers firebase pull
   componentDidMount() {
-    const selectionRef = firebase.database().ref('AkOM')
-    selectionRef.on('value', (snapshot) => {
-      let unsortedHeadings = Object.keys(snapshot.val())
-      let sortedHeadings = []
+    this.pullFirebase()
+  }
 
-      console.log(unsortedHeadings)
-
-      // Heading sorter
-      for (const heading of unsortedHeadings) {
-        if (heading[2] !== "@") {
-          sortedHeadings.push(heading.replace("@", "."))
-        }
-      }
-
-      for (const heading of unsortedHeadings) {
-        if (!sortedHeadings.includes(heading.replace("@", "."))) {
-          sortedHeadings.push(heading.replace("@", "."))
-        }
-      }
-
-      this.setState({headers: sortedHeadings})
-    })
+  componentDidUpdate(prevProps: any) {
+    if (prevProps.instrTarget != this.props.instrTarget && this.props.instrTarget !== '') {
+      this.pullFirebase()
+    }
   }
 
   render() {
     return(
-      <div className="text-left pl-20 pt-4">
+      <div key={this.props.instrTarget} className="text-left pl-20 pt-4">
         {this.state.headers.map((el: any) => (
           <div className="text-3xl font-bold">{el}</div>
         ))}
