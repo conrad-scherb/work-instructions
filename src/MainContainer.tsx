@@ -55,7 +55,7 @@ class MainContainer extends React.Component<any, any> {
       )
     } else {
       return (
-        <div>
+        <div className="w-screen">
           <LoginContainer 
             handleSubmit={this.handleSubmit}
             onPwChange={this.handlePwChange}

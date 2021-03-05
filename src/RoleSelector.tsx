@@ -25,49 +25,51 @@ class RoleSelector extends React.Component<any, any> {
 
   render() {
     return(
-    <form onSubmit={this.props.handleInstrGet}>
-      <table className="table-fixed">
-        <tr>
-          <td className="w-1/2 text-left">
-            <input onChange={this.handleBranchChange} type="radio" id ="ak" name="branch" value="ak"/>
-            <label htmlFor="ak"> Auckland</label>
-          </td>
+    <div className="m-auto" style={{width:"345px"}}>
+      <form onSubmit={this.props.handleInstrGet}>
+        <table className="table-fixed">
+          <tr>
+            <td className="w-1/2 text-left">
+              <input onChange={this.handleBranchChange} type="radio" id ="ak" name="branch" value="ak"/>
+              <label htmlFor="ak"> Auckland</label>
+            </td>
 
-          <td className="text-left">
-            <input onChange={this.handleRoleChange} type="radio" id ="om" name="role" value="om"/>
-            <label htmlFor="om"> Operations Manager</label>
-          </td>
-        </tr>
+            <td className="text-left">
+              <input onChange={this.handleRoleChange} type="radio" id ="om" name="role" value="om"/>
+              <label htmlFor="om"> Operations Manager</label>
+            </td>
+          </tr>
 
-        <tr>
-          <td className="text-left">
-            <input onChange={this.handleBranchChange} type="radio" id ="wlg" name="branch" value="wlg"/>
-            <label htmlFor="wlg"> Wellington</label>
-          </td>
+          <tr>
+            <td className="text-left">
+              <input onChange={this.handleBranchChange} type="radio" id ="wlg" name="branch" value="wlg"/>
+              <label htmlFor="wlg"> Wellington</label>
+            </td>
 
-          <td className="text-left">
-            <input onChange={this.handleRoleChange} type="radio" id ="pm" name="role" value="pm"/>
-            <label htmlFor="pm"> Production Manager</label>
-          </td>
-        </tr>
-      
-        <tr>
-          <td className="text-left">
-            <input onChange={this.handleBranchChange} type="radio" id ="rot" name="branch" value="rot"/>
-            <label htmlFor="rot"> Rotorua</label>
-          </td>
+            <td className="text-left">
+              <input onChange={this.handleRoleChange} type="radio" id ="pm" name="role" value="pm"/>
+              <label htmlFor="pm"> Production Manager</label>
+            </td>
+          </tr>
+        
+          <tr>
+            <td className="text-left">
+              <input onChange={this.handleBranchChange} type="radio" id ="rot" name="branch" value="rot"/>
+              <label htmlFor="rot"> Rotorua</label>
+            </td>
 
-          <td className="text-left">
-            <input onChange={this.handleRoleChange} type="radio" id ="pa" name="role" value="pa"/>
-            <label htmlFor="pa"> Production Assistant</label>
-          </td>
-        </tr>
-      </table>
+            <td className="text-left">
+              <input onChange={this.handleRoleChange} type="radio" id ="pa" name="role" value="pa"/>
+              <label htmlFor="pa"> Production Assistant</label>
+            </td>
+          </tr>
+        </table>
 
-      <div className="pt-4">
-        <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Get instructions" />
-      </div>
-    </form>
+        <div className="pt-4">
+          <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Get instructions" />
+        </div>
+      </form>
+    </div>
     )
   }
 }

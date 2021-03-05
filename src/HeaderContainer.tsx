@@ -20,13 +20,13 @@ class HeaderContainer extends React.Component<any, any> {
 
       // Heading sorter
       for (const heading of unsortedHeadings) {
-        if (heading[2] != "@") {
+        if (heading[2] !== "@") {
           sortedHeadings.push(heading.replace("@", "."))
         }
       }
 
       for (const heading of unsortedHeadings) {
-        if (!sortedHeadings.includes(heading)) {
+        if (!sortedHeadings.includes(heading.replace("@", "."))) {
           sortedHeadings.push(heading.replace("@", "."))
         }
       }
@@ -37,9 +37,9 @@ class HeaderContainer extends React.Component<any, any> {
 
   render() {
     return(
-      <div className="text-left w-screen">
+      <div className="text-left pl-20 pt-4">
         {this.state.headers.map((el: any) => (
-          <p>{el}</p>
+          <div className="text-3xl font-bold">{el}</div>
         ))}
       </div>
     )
