@@ -10,26 +10,19 @@ class LoginContainer extends React.Component<any, any> {
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
   
   handleChange(event: any) {
     this.setState({value: event.target.value});
-  }
-
-  handleSubmit(event: any) {
-    if (this.state.value == "escapefromlevel11") {
-      this.setState({hidden: true})
-    } else {
-      alert("That password is incorrect!")
-    }
-    event.preventDefault();
+    this.props.onPwChange({value: event.target.value});
   }
 
   render() {
-    if (!this.state.hidden) {
+    const loggedIn = this.props.loggedIn
+
+    if (!loggedIn) {
       return (
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.props.handleSubmit}>
             <label >Password: </label>
             <input type="text" value={this.state.value} onChange={this.handleChange} />
             <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Submit" />
