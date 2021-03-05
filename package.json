@@ -10,6 +10,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "firebase": "^8.2.10",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
@@ -23,7 +24,7 @@
     "build:css": "postcss src/styles/tailwind.css -o src/styles/tailwind.output.css",
     "watch:css": "chokidar \"./tailwind.config.js\" \"./src/styles/tailwind.css\" -c \"npm run build:css\"",
     "prebuild": "cross-env NODE_ENV=production run-s build:css",
-    "start": "npm-run-all build:css --parallel watch:css start:react",    
+    "start": "npm-run-all build:css --parallel watch:css start:react",
     "start:react": "react-scripts start"
   },
   "eslintConfig": {

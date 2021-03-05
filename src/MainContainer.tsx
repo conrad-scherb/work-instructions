@@ -1,5 +1,7 @@
 import React from 'react';
+import HeaderContainer from './HeaderContainer';
 import LoginContainer from './LoginContainer';
+import RoleSelector from './RoleSelector';
 import "./styles/tailwind.output.css"
 
 class MainContainer extends React.Component<any, any> {
@@ -7,14 +9,19 @@ class MainContainer extends React.Component<any, any> {
     super(props);
     this.state = {
       loggedIn: false,
-      password: ''
+      password: '',
+      branch: '',
+      role: ''
     };
 
     this.handlePwChange = this.handlePwChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleInstrGet = this.handleInstrGet.bind(this);
+    this.handleRoleChange = this.handleRoleChange.bind(this);
+    this.handleBranchChange = this.handleBranchChange.bind(this);
   }
 
   handleSubmit(event: any) {
-    console.log(this.state.password.value)
     if (this.state.password.value === "escapefromlevel11") {
       this.setState({loggedIn: true})
     } else {
@@ -28,6 +35,19 @@ class MainContainer extends React.Component<any, any> {
     this.setState({password: pw})
   }
 
+  handleBranchChange(branch: any) {
+    this.setState({branch: branch})
+  }
+
+  handleRoleChange(role: any) {
+    this.setState({role: role})
+  }
+
+  handleInstrGet(event: any) {
+    console.log(this.state.role.value+this.state.branch.value)
+    event.preventDefault()
+  }
+
   render() {
     if (this.state.loggedIn) {
       return (
@@ -35,10 +55,18 @@ class MainContainer extends React.Component<any, any> {
       )
     } else {
       return (
-        <LoginContainer 
-          handleSubmit={this.handleSubmit.bind(this)}
-          onPwChange={this.handlePwChange}
-        />
+        <div>
+          <LoginContainer 
+            handleSubmit={this.handleSubmit}
+            onPwChange={this.handlePwChange}
+          />
+          <RoleSelector
+            handleInstrGet={this.handleInstrGet}
+            onBranchChange={this.handleBranchChange}
+            onRoleChange={this.handleRoleChange}
+          />
+          <HeaderContainer/>
+        </div>
       )
     }
   }
