@@ -2,6 +2,7 @@ import React from 'react';
 import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
 import RichTextbox from '../components/RichTextbox';
+import InstructionElement from '../components/InstructionElement';
 
 class HeaderContainer extends React.Component<any, any> {
   constructor(props: any) {
@@ -13,7 +14,7 @@ class HeaderContainer extends React.Component<any, any> {
   }
 
   pullFirebase() {
-    if (this.props.instrTarget !== '') {
+    if (this.props.instrTarget.length > 3) {
       const selectionRef = firebase.database().ref(this.props.instrTarget)
       selectionRef.on('value', (snapshot) => {
         let unsortedHeadings = Object.keys(snapshot.val())
@@ -52,9 +53,14 @@ class HeaderContainer extends React.Component<any, any> {
     return(
       <div key={this.props.instrTarget} className="text-left px-20 pt-4">
         {this.state.headers.map((el: any) => (
-          <div className="text-3xl font-bold">{el}</div>
+          <>
+            <div className="text-3xl font-bold">{el}</div>
+            <InstructionElement
+              instrTarget={this.props.instrTarget}
+              header={el}
+            />
+          </>
         ))}
-        <RichTextbox/>
       </div>
     )
   }
