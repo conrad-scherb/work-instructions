@@ -25,7 +25,7 @@ class LoginContainer extends React.Component<any, any> {
         <form onSubmit={this.props.handleSubmit}>
             <label >Password: </label>
             <input type="text" value={this.state.value} onChange={this.handleChange} />
-            <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Submit" />
+            <input className="bg-blue-300 hover:bg-blue-400 px-2 rounded-full" type="submit" value="Submit" />
         </form>
       );
     } else {

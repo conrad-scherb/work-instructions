@@ -1,14 +1,19 @@
 import firebase from 'firebase';
 import React from 'react';
-import "../styles/tailwind.output.css"
+import "../styles/tailwind.output.css";
+import RichTextbox from './RichTextbox';
 
 class InstructionElement extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
       subheaders: [],
-      contents: []
+      contents: [],
+      editedContents: [],
+      editing: []
     };
+
+    this.handleTextEdit = this.handleTextEdit.bind(this)
   }
 
   pullFirebaseSubheaders() {
@@ -22,8 +27,22 @@ class InstructionElement extends React.Component<any, any> {
           contents.push(snapshot.val()[key])
         }
         this.setState({contents: contents})
+        this.setState({editedContents: contents})
+        this.setState({editing: Array(Object.keys(snapshot.val()).length).fill(false)})
       })
     }
+  }
+
+  handleEditClick(idx: any) {
+    let editingCopy = this.state.editing
+    editingCopy[idx] = !editingCopy[idx]
+    this.setState({editing: editingCopy})
+  }
+
+  handleTextEdit(contents: any, idx: any) {
+    let editingCopy = this.state.editedContents
+    editingCopy[idx] = contents
+    this.setState({editedContents: editingCopy})
   }
 
   // Mounting the container for headers triggers firebase pull
@@ -42,15 +61,34 @@ class InstructionElement extends React.Component<any, any> {
                                         ? this.props.header[0] 
                                         : this.props.header.slice(2)) 
                     + '.' + (idx+1) + ". " + el
-                  }</div>
+                  }
+                </div>
                 <div className="flex space-x-2">
-                  <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Edit" />
-                  <input className="bg-red-300 px-2 rounded-full" type="submit" value="Remove" />
+                  {this.state.editing[idx] && 
+                    <input className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full" type="submit" value="Save" />
+                  }
+                  <input className="bg-blue-300 hover:bg-blue-400 px-2 rounded-full" 
+                         type="submit" value="Edit" onClick={() => this.handleEditClick(idx)
+                  }/>
+                  <input className="bg-red-300 hover:bg-red-400 px-2 rounded-full" type="submit" value="Remove" />
                 </div>
               </div>
-              <div className="text-sm">
-                {((this.state.contents[idx]))}
-              </div>
+
+              {!this.state.editing[idx] && 
+                <div className="text-sm">
+                  {((this.state.contents[idx]))}
+                </div>
+              }
+
+              {this.state.editing[idx] &&
+                <div className="pt-2">
+                  <RichTextbox
+                    contents={this.state.contents[idx]}
+                    index={idx}
+                    handleTextEdit={this.handleTextEdit}
+                  />
+                </div>
+              }
             </div>
         ))}
       </div>

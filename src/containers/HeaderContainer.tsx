@@ -57,7 +57,7 @@ class HeaderContainer extends React.Component<any, any> {
             <div className="flex justify-between">
               <div className="text-3xl font-bold">{el}</div>
               <div className="text-1xl pt-1.5">
-                <input className="bg-green-300 px-2 rounded-full text-base" type="submit" value="Add" />
+                <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" />
               </div>
             </div>
             <InstructionElement

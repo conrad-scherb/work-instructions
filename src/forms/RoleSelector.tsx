@@ -66,7 +66,7 @@ class RoleSelector extends React.Component<any, any> {
         </table>
 
         <div className="pt-4">
-          <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Get instructions" />
+          <input className="bg-blue-300 hover:bg-blue-400 px-2 rounded-full" type="submit" value="Get instructions" />
         </div>
       </form>
     </div>
