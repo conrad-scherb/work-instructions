@@ -54,7 +54,12 @@ class HeaderContainer extends React.Component<any, any> {
       <div key={this.props.instrTarget} className="text-left px-20 pt-4">
         {this.state.headers.map((el: any) => (
           <>
-            <div className="text-3xl font-bold">{el}</div>
+            <div className="flex justify-between">
+              <div className="text-3xl font-bold">{el}</div>
+              <div className="text-1xl pt-1.5">
+                <input className="bg-green-300 px-2 rounded-full text-base" type="submit" value="Add" />
+              </div>
+            </div>
             <InstructionElement
               instrTarget={this.props.instrTarget}
               header={el}

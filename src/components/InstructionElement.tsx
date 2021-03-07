@@ -36,12 +36,18 @@ class InstructionElement extends React.Component<any, any> {
       <div key={this.props.instrTarget} className="pb-4">
         {this.state.subheaders.map((el: any, idx: any) => (
             <div className="pb-2">
-              <div className="text-1xl font-bold">
-                {((this.props.header[1] == '.') 
-                                      ? this.props.header[0] 
-                                      : this.props.header.slice(2)) 
-                  + '.' + (idx+1) + ". " + el
-                }</div>
+              <div className="flex justify-between">
+                <div className="text-1xl font-bold">
+                  {((this.props.header[1] == '.') 
+                                        ? this.props.header[0] 
+                                        : this.props.header.slice(2)) 
+                    + '.' + (idx+1) + ". " + el
+                  }</div>
+                <div className="flex space-x-2">
+                  <input className="bg-blue-300 px-2 rounded-full" type="submit" value="Edit" />
+                  <input className="bg-red-300 px-2 rounded-full" type="submit" value="Remove" />
+                </div>
+              </div>
               <div className="text-sm">
                 {((this.state.contents[idx]))}
               </div>
