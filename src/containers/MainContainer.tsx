@@ -3,6 +3,7 @@ import HeaderContainer from './HeaderContainer';
 import LoginContainer from './LoginContainer';
 import RoleSelector from '../forms/RoleSelector';
 import "../styles/tailwind.output.css"
+import RichTextbox from '../components/RichTextbox';
 
 class MainContainer extends React.Component<any, any> {
   constructor(props: any) {

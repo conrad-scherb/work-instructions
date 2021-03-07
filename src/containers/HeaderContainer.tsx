@@ -1,6 +1,7 @@
 import React from 'react';
 import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
+import RichTextbox from '../components/RichTextbox';
 
 class HeaderContainer extends React.Component<any, any> {
   constructor(props: any) {
@@ -49,10 +50,11 @@ class HeaderContainer extends React.Component<any, any> {
 
   render() {
     return(
-      <div key={this.props.instrTarget} className="text-left pl-20 pt-4">
+      <div key={this.props.instrTarget} className="text-left px-20 pt-4">
         {this.state.headers.map((el: any) => (
           <div className="text-3xl font-bold">{el}</div>
         ))}
+        <RichTextbox/>
       </div>
     )
   }
