@@ -1,14 +1,18 @@
 import React from 'react';
 import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
-import RichTextbox from '../components/RichTextbox';
 import InstructionElement from '../components/InstructionElement';
+
+export interface updates {
+  [details: string]: string
+}
 
 class HeaderContainer extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      headers: []
+      headers: [],
+      count: 0
     };
 
   }
@@ -38,6 +42,15 @@ class HeaderContainer extends React.Component<any, any> {
     }
   }
 
+  handleAddClick(idx: any) {
+    var updates: updates = {}
+    updates[this.props.instrTarget 
+            + '/' + this.state.headers[idx].replace('.','@')
+            + '/' + "New Instruction " + (this.state.count+1)] = "Edit this instruction..."
+    firebase.database().ref().update(updates)
+    this.setState({count: this.state.count + 1})
+  }
+
   // Mounting the container for headers triggers firebase pull
   componentDidMount() {
     this.pullFirebase()
@@ -52,12 +65,12 @@ class HeaderContainer extends React.Component<any, any> {
   render() {
     return(
       <div key={this.props.instrTarget} className="text-left px-20 pt-4">
-        {this.state.headers.map((el: any) => (
+        {this.state.headers.map((el: any, idx: any) => (
           <>
             <div className="flex justify-between">
               <div className="text-3xl font-bold">{el}</div>
               <div className="text-1xl pt-1.5">
-                <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" />
+                <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
               </div>
             </div>
             <InstructionElement

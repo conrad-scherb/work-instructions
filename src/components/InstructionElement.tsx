@@ -2,6 +2,11 @@ import firebase from 'firebase';
 import React from 'react';
 import "../styles/tailwind.output.css";
 import RichTextbox from './RichTextbox';
+import parse from 'html-react-parser'
+
+export interface updates {
+  [details: string]: string
+}
 
 class InstructionElement extends React.Component<any, any> {
   constructor(props: any) {
@@ -14,6 +19,7 @@ class InstructionElement extends React.Component<any, any> {
     };
 
     this.handleTextEdit = this.handleTextEdit.bind(this)
+    this.handleSaveClick = this.handleSaveClick.bind(this)
   }
 
   pullFirebaseSubheaders() {
@@ -32,11 +38,28 @@ class InstructionElement extends React.Component<any, any> {
       })
     }
   }
+  
+  updateFirebaseSubheaderContents(newContents: any, idx: any) {
+    var updates: updates = {}
+    updates[this.props.instrTarget 
+            + '/' + this.props.header.replace('.','@')
+            + '/' + this.state.subheaders[idx]] = newContents
+    firebase.database().ref().update(updates)
+  }
 
   handleEditClick(idx: any) {
     let editingCopy = this.state.editing
     editingCopy[idx] = !editingCopy[idx]
     this.setState({editing: editingCopy})
+  }
+
+  handleSaveClick(idx: any) {
+    console.log(this.state)
+    let contentsCopy = this.state.contents
+    contentsCopy[idx] = this.state.editedContents[idx]
+    this.setState({contents: contentsCopy})
+    this.updateFirebaseSubheaderContents(contentsCopy[idx], idx)
+    this.handleEditClick(idx)
   }
 
   handleTextEdit(contents: any, idx: any) {
@@ -65,18 +88,17 @@ class InstructionElement extends React.Component<any, any> {
                 </div>
                 <div className="flex space-x-2">
                   {this.state.editing[idx] && 
-                    <input className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full" type="submit" value="Save" />
+                    <input onClick={() => this.handleSaveClick(idx)} className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full" type="submit" value="Save" />
                   }
                   <input className="bg-blue-300 hover:bg-blue-400 px-2 rounded-full" 
-                         type="submit" value="Edit" onClick={() => this.handleEditClick(idx)
-                  }/>
+                         type="submit" value="Edit" onClick={() => this.handleEditClick(idx)}/>
                   <input className="bg-red-300 hover:bg-red-400 px-2 rounded-full" type="submit" value="Remove" />
                 </div>
               </div>
 
               {!this.state.editing[idx] && 
                 <div className="text-sm">
-                  {((this.state.contents[idx]))}
+                  {parse(this.state.contents[idx])}
                 </div>
               }
 
