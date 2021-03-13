@@ -57,7 +57,7 @@ class HeaderContainer extends React.Component<any, any> {
   }
 
   componentDidUpdate(prevProps: any) {
-    if (prevProps.instrTarget != this.props.instrTarget && this.props.instrTarget !== '') {
+    if (prevProps.instrTarget !== this.props.instrTarget && this.props.instrTarget !== '') {
       this.pullFirebase()
     }
   }
@@ -70,11 +70,14 @@ class HeaderContainer extends React.Component<any, any> {
             <div className="flex justify-between">
               <div className="text-3xl font-bold">{el}</div>
               <div className="text-1xl pt-1.5">
-                <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
+                {this.props.loggedIn &&
+                  <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
+                }
               </div>
             </div>
             <InstructionElement
               instrTarget={this.props.instrTarget}
+              loggedIn={this.props.loggedIn}
               header={el}
             />
           </>

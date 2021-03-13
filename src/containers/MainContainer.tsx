@@ -50,11 +50,11 @@ class MainContainer extends React.Component<any, any> {
   }
 
   render() {
-    if (this.state.loggedIn) {
+    /*if (this.state.loggedIn) {
       return (
         <p>yep</p>
       )
-    } else {
+    } else {*/
       return (
         <div className="w-screen">
           <LoginContainer 
@@ -68,10 +68,11 @@ class MainContainer extends React.Component<any, any> {
           />
           <HeaderContainer
             instrTarget={this.state.instrTarget}
+            loggedIn={this.state.loggedIn}
           />
         </div>
       )
-    }
+    //}
   }
 }
 
