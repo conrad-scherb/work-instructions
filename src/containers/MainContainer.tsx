@@ -45,16 +45,12 @@ class MainContainer extends React.Component<any, any> {
   }
 
   handleInstrGet(event: any) {
+    console.log(this.state)
     this.setState({instrTarget: this.state.branch.value+this.state.role.value})
     event.preventDefault()
   }
 
   render() {
-    /*if (this.state.loggedIn) {
-      return (
-        <p>yep</p>
-      )
-    } else {*/
       return (
         <div className="w-screen">
           <LoginContainer 
