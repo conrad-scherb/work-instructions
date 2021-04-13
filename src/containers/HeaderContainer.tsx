@@ -17,7 +17,7 @@ class HeaderContainer extends React.Component<any, any> {
 
   }
 
-  pullFirebase() {
+  pullFirebase() { 
     if (this.props.instrTarget.length > 3) {
       const selectionRef = firebase.database().ref(this.props.instrTarget)
       selectionRef.on('value', (snapshot) => {

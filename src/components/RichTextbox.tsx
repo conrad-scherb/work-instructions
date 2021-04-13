@@ -18,9 +18,10 @@ class RichTextbox extends React.Component<any, any> {
           <SunEditor 
             onChange={this.handleChange}
             setContents={this.props.contents}
+            setDefaultStyle="font-size: 12px;"
             setOptions={{
               height: 150,
-              buttonList: [['font', 'bold', 'underline', 'italic', 'strike'], ['align', 'fontColor', 'list', 'image'], ['codeView','save']]
+              buttonList: [['font', 'fontSize', 'bold', 'underline', 'italic', 'strike'], ['align', 'fontColor', 'list', 'image'], ['codeView','save']]
             }}
           />
       )
