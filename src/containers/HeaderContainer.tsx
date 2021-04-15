@@ -13,18 +13,19 @@ class HeaderContainer extends React.Component<any, any> {
     super(props);
     this.state = {
       headers: [],
-      count: 0
+      list: [],
+      count: 0,
+      showHeaders: false
     };
 
+    this.passUpListOrder = this.passUpListOrder.bind(this)
   }
 
   pullFirebase() { 
     if (this.props.instrTarget.length > 3) {
       const selectionRef = firebase.database().ref(this.props.instrTarget)
-      console.log(this.props.instrTarget)
       selectionRef.on('value', (snapshot) => {
         let unsortedHeadings = Object.keys(snapshot.val())
-        console.log(unsortedHeadings)
         let sortedHeadings = []
 
         // Heading sorter
@@ -41,8 +42,6 @@ class HeaderContainer extends React.Component<any, any> {
         }
 
         this.setState({headers: sortedHeadings})
-
-        console.log(this.state.headers)
       })
     }
   }
@@ -51,21 +50,54 @@ class HeaderContainer extends React.Component<any, any> {
     var updates: updates = {}
     updates[this.props.instrTarget 
             + '/' + this.state.headers[idx].replace('.','@')
-            + '/' + "New Instruction " + (this.state.count+1)] = "Edit this instruction..."
+            + '/' + "New Instruction " + (this.state.count+1)] = "X@ Edit this instruction..."
     firebase.database().ref().update(updates)
     this.setState({count: this.state.count + 1})
   }
 
   handleAddHeadingClick() {
-    let newHeading = prompt('Enter the new heading name');
-    var headingCopy = this.state.headers
-    headingCopy.push(newHeading)
-    this.setState({headers: headingCopy})
+    let newHeading: string = prompt('Enter the new heading name')!;
+    var updates: updates = {}
+    updates[this.props.instrTarget 
+            + '/' + newHeading 
+            + '/' + "New instruction"] = "Edit this instruction..."
+    firebase.database().ref().update(updates)
+    this.setState({count: this.state.count + 1})
   }
 
   handleManageClick() {
+    this.setState({showHeaders: true})
   }
 
+  handleSaveChangesClick() {
+    let newHeaderOrder = []
+    let count = 1
+    
+    this.setState({showHeaders: false})
+
+    for (let i of this.state.list) {
+      newHeaderOrder.push(i.name)
+    }
+    
+    for (let i of newHeaderOrder) {
+      for (let j in this.state.headers) {
+        if (this.state.headers[j].substring(this.state.headers[j].indexOf(" ") + 1) == i) {
+          var ref = firebase.database().ref(this.props.instrTarget);
+          let old = this.state.headers[j].replace('.','@')
+          let newPath = count + "@ " + i
+          ref.child(old).once('value').then(function(snap) {
+            var data = snap.val();
+            var update: any = {};
+            update[old] = null;
+            update[newPath] = data;
+            return ref.update(update);
+          })
+          count++
+        }
+      }
+    }
+  }
+  
   // Mounting the container for headers triggers firebase pull
   componentDidMount() {
     this.pullFirebase()
@@ -77,20 +109,27 @@ class HeaderContainer extends React.Component<any, any> {
     }
   }
 
+  passUpListOrder(newOrder: any) {
+    this.setState({list: newOrder})
+  }
+
   render() {
     return(
       <>
         <div className="center pt-0.5">
           {this.props.loggedIn && 
-            <div className="flex space-x-2 justify-center">
-              <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Manage headings" onClick={() => this.handleManageClick()}/>
-              <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
-              <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Save changes" onClick={() => this.handleManageClick()}/>
-            </div>
+            <>
+              <div className="flex space-x-2 justify-center">
+                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Manage headings" onClick={() => this.handleManageClick()}/>
+                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
+                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Save changes" onClick={() => this.handleSaveChangesClick()}/>
+              </div>
+              <HeaderList
+              headers={this.state.headers}
+              passUpListOrder={this.passUpListOrder}
+              />
+            </>
           }
-        <HeaderList
-          headers={this.state.headers}
-        />
         </div>
         <div key={this.props.instrTarget} className="text-left px-20 pt-4">
           {this.state.headers.map((el: any, idx: any) => (

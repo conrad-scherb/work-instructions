@@ -3,6 +3,7 @@ import { ReactSortable } from "react-sortablejs";
 
 interface BasicClassState {
   list: { id: string; name: string }[];
+  prevList: { id: string; name: string }[];
 }
 
 export class HeaderList extends Component<any, BasicClassState> {
@@ -14,6 +15,9 @@ export class HeaderList extends Component<any, BasicClassState> {
     list: [{ id: "1", name: "Answering the intercom and doorbell" }, 
           {id: "2", name: "Meeting and greeting players"},
           {id: "3", name: "Checking or creating a booking"}],
+    prevList: [{ id: "1", name: "Answering the intercom and doorbell" }, 
+    {id: "2", name: "Meeting and greeting players"},
+    {id: "3", name: "Checking or creating a booking"}],
   };
 
   render() {
@@ -40,7 +44,11 @@ export class HeaderList extends Component<any, BasicClassState> {
       }
       this.setState({list: newList})
     }
-    console.log(this.state.list)
+
+    if (this.state.prevList != this.state.list) {
+      this.props.passUpListOrder(this.state.list)
+      this.setState({prevList: this.state.list})
+    }
   }
 }
 
