@@ -45,7 +45,6 @@ class MainContainer extends React.Component<any, any> {
   }
 
   handleInstrGet(event: any) {
-    console.log(this.state)
     this.setState({instrTarget: this.state.branch.value+this.state.role.value})
     event.preventDefault()
   }

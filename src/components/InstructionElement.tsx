@@ -32,7 +32,6 @@ class InstructionElement extends React.Component<any, any> {
 
   pullFirebaseSubheaders() {
     if (this.props.header !== '') {
-      console.log(this.props.instrTarget + '/' + this.props.header.replace('.',"@"))
       const selectionRef = firebase.database().ref(this.props.instrTarget + '/' + this.props.header.replace('.',"@"))
       selectionRef.on('value', (snapshot) => {
         this.setState({subheaders: Object.keys(snapshot.val())})
@@ -84,7 +83,6 @@ class InstructionElement extends React.Component<any, any> {
   }
 
   handleSaveClick(idx: any) {
-    console.log(this.state)
     let contentsCopy = this.state.contents
     contentsCopy[idx] = this.state.editedContents[idx]
     this.setState({contents: contentsCopy})
@@ -109,7 +107,6 @@ class InstructionElement extends React.Component<any, any> {
 
   handleRenameTextChange(event: any, idx: any) {
     let renamesCopy = this.state.renameContents
-    console.log(event.target.value)
     renamesCopy[idx] = event.target.value
     this.setState({renameContents: renamesCopy});
   }

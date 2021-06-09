@@ -12,12 +12,8 @@ export class HeaderList extends Component<any, BasicClassState> {
   }
 
   state: BasicClassState = {
-    list: [{ id: "1", name: "Answering the intercom and doorbell" }, 
-          {id: "2", name: "Meeting and greeting players"},
-          {id: "3", name: "Checking or creating a booking"}],
-    prevList: [{ id: "1", name: "Answering the intercom and doorbell" }, 
-    {id: "2", name: "Meeting and greeting players"},
-    {id: "3", name: "Checking or creating a booking"}],
+    list: [],
+    prevList: [],
   };
 
   render() {

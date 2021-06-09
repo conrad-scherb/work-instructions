@@ -59,7 +59,7 @@ class HeaderContainer extends React.Component<any, any> {
     let newHeading: string = prompt('Enter the new heading name')!;
     var updates: updates = {}
     updates[this.props.instrTarget 
-            + '/' + newHeading 
+            + '/' + "X@ " + newHeading 
             + '/' + "New instruction"] = "Edit this instruction..."
     firebase.database().ref().update(updates)
     this.setState({count: this.state.count + 1})
@@ -120,7 +120,8 @@ class HeaderContainer extends React.Component<any, any> {
           {this.props.loggedIn && 
             <>
               <div className="flex space-x-2 justify-center">
-                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Manage headings" onClick={() => this.handleManageClick()}/>
+                {//<input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Manage headings" onClick={() => this.handleManageClick()}/>
+                }
                 <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
                 <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Save changes" onClick={() => this.handleSaveChangesClick()}/>
               </div>
