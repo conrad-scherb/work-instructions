@@ -56,11 +56,12 @@ class MainContainer extends React.Component<any, any> {
             handleSubmit={this.handleSubmit}
             onPwChange={this.handlePwChange}
           />
-          <RoleSelector
+          {this.state.loggedIn == true && <RoleSelector
             handleInstrGet={this.handleInstrGet}
             onBranchChange={this.handleBranchChange}
             onRoleChange={this.handleRoleChange}
           />
+          }
           <HeaderContainer
             instrTarget={this.state.instrTarget}
             loggedIn={this.state.loggedIn}

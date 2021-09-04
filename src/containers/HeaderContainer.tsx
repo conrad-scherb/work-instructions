@@ -3,9 +3,30 @@ import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
 import InstructionElement from '../components/InstructionElement';
 import HeaderList from '../components/HeaderList';
+import { ReactSortable } from "react-sortablejs";
+import { SubheadingRearranger } from '../components/SubheadingRearranger';
+
 
 export interface updates {
-  [details: string]: string
+  [details: string]: any
+}
+
+async function getHighestSubheadingNum(selectionPath: any) {
+  return new Promise(function(resolve, reject) {
+    const selectionRef = firebase.database().ref(selectionPath)
+
+    selectionRef.on('value', (snapshot) => {
+      let keys = Object.keys(snapshot.val())
+      if (keys.length == 0) {
+        return resolve(1)
+      }
+      let lastKey = keys[keys.length-1]
+      let lastNum = parseInt(lastKey[0])+1
+  
+      return resolve(lastNum)
+    })
+    return reject();
+  })
 }
 
 class HeaderContainer extends React.Component<any, any> {
@@ -14,8 +35,12 @@ class HeaderContainer extends React.Component<any, any> {
     this.state = {
       headers: [],
       list: [],
+      rearranges: [],
+      addToOthers: [],
+      checkboxes: [],
       count: 0,
-      showHeaders: false
+      showHeaders: false,
+      showHeadingEdit: false
     };
 
     this.passUpListOrder = this.passUpListOrder.bind(this)
@@ -41,6 +66,9 @@ class HeaderContainer extends React.Component<any, any> {
           }
         }
 
+        this.setState({rearranges: Array(unsortedHeadings.length).fill(false)})
+        this.setState({addToOthers: Array(unsortedHeadings.length).fill(false)})
+        this.setState({checkboxes: Array(unsortedHeadings.length).fill([])})
         this.setState({headers: sortedHeadings})
       })
     }
@@ -48,21 +76,94 @@ class HeaderContainer extends React.Component<any, any> {
 
   handleAddClick(idx: any) {
     var updates: updates = {}
-    updates[this.props.instrTarget 
-            + '/' + this.state.headers[idx].replace('.','@')
-            + '/' + "New Instruction " + (this.state.count+1)] = "X@ Edit this instruction..."
-    firebase.database().ref().update(updates)
-    this.setState({count: this.state.count + 1})
+    let selectionPath = this.props.instrTarget + "/" + this.state.headers[idx].replace(".","@")
+
+    getHighestSubheadingNum(selectionPath).then((lastNum) => {
+      let path = this.props.instrTarget 
+               + '/' + this.state.headers[idx].replace('.','@')
+               + '/' + lastNum + "@ New Instruction"
+
+      updates[path] = "Edit this instruction..."
+      firebase.database().ref().update(updates)
+    })
   }
 
   handleAddHeadingClick() {
     let newHeading: string = prompt('Enter the new heading name')!;
     var updates: updates = {}
     updates[this.props.instrTarget 
-            + '/' + "X@ " + newHeading 
+            + '/' + "1@ " + newHeading 
             + '/' + "New instruction"] = "Edit this instruction..."
     firebase.database().ref().update(updates)
     this.setState({count: this.state.count + 1})
+  }
+
+  handleShowEditModeChange() {
+    this.setState({showHeadingEdit: !this.state.showHeadingEdit})
+  }
+
+  handleRearrangeClick(idx: any) {
+    let oldRearranges = this.state.rearranges
+    oldRearranges[idx] = !oldRearranges[idx]
+    this.setState({rearranges: oldRearranges})
+  }
+
+  handleCheckboxTick(idx: any, role: any) {
+    let checkboxes = this.state.checkboxes
+    if (!checkboxes[idx].includes(role)) {
+      let row = checkboxes[idx]
+      console.log(row)
+      row.push(role)
+      checkboxes[idx] = row
+    } else {
+      checkboxes[idx].splice(checkboxes[idx].indexOf(role), 1)
+    }
+    this.setState({checkboxes: checkboxes})
+  }
+
+  handleSubmitAddToOthers(idx: any) {
+    const selectionRef = firebase.database().ref(this.props.instrTarget)
+    let heading = this.state.headers[idx].replace(".","@")
+    selectionRef.child(heading).once('value').then((snap) => {
+      var data = snap.val()
+      let headingNum = heading.split("@")[0]
+
+      for (let position of this.state.checkboxes[idx]) {
+        let ref = firebase.database().ref(position)
+        ref.once('value').then((snap) => {
+          let old = ""
+
+          for (let key of Object.keys(snap.val())) {
+            if (key.split("@")[0] == headingNum) {
+              old = key
+            }
+          }
+
+          var update: updates = {}
+          if (old != "") {
+            update[old] = null
+          }
+          update[heading] = data
+          ref.update(update)
+        })
+      }
+
+      let check = this.state.checkboxes
+      check[idx] = []
+      let add = this.state.addToOthers
+      add[idx] = false
+      this.setState({
+        checkboxes: check,
+        addToOthers: add
+      })
+      alert("Instruction has been copied over to the other roles")
+    })
+  }
+
+  handleAddToOthersClick(idx: any) {
+    let oldAdds = this.state.addToOthers
+    oldAdds[idx] = !oldAdds[idx]
+    this.setState({addToOthers: oldAdds})
   }
 
   handleManageClick() {
@@ -119,36 +220,92 @@ class HeaderContainer extends React.Component<any, any> {
         <div className="center pt-0.5">
           {this.props.loggedIn && 
             <>
-              <div className="flex space-x-2 justify-center">
-                {//<input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Manage headings" onClick={() => this.handleManageClick()}/>
-                }
-                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
-                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Save changes" onClick={() => this.handleSaveChangesClick()}/>
+              <div className="pb-0.5">
+                <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Edit mode on/off" onClick={() => this.handleShowEditModeChange()}/>
               </div>
+
+              {this.state.showHeadingEdit && 
+                <>
+                  <div className="flex space-x-2 justify-center">
+                    <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
+                    <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Save changes" onClick={() => this.handleSaveChangesClick()}/>
+                  </div>
+                </>
+              }
+
               <HeaderList
-              headers={this.state.headers}
-              passUpListOrder={this.passUpListOrder}
-              />
+                headers={this.state.headers}
+                passUpListOrder={this.passUpListOrder}
+                visible={this.state.showHeadingEdit}
+              />    
             </>
           }
         </div>
+        
         <div key={this.props.instrTarget} className="text-left px-20 pt-4">
           {this.state.headers.map((el: any, idx: any) => (
-            <>
+            <>  
+              {/* Heading menu bar */}
               <div className="flex justify-between">
                 <div className="text-3xl font-bold">{el}</div>
                 <div className="text-1xl pt-1.5">
-                  {this.props.loggedIn &&
-                    <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
+                  {this.state.showHeadingEdit &&
+                    <div className="flex space-x-2 justify-center">
+                      <input className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full text-base" type="submit" value="Rearrange" onClick={() => this.handleRearrangeClick(idx)}/>
+                      <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
+                      <input className="bg-indigo-300 hover:bg-indigo-400 px-2 rounded-full text-base" type="submit" value="Add to other roles" onClick={() => this.handleAddToOthersClick(idx)}/>
+                    </div>
                   }
                 </div>
               </div>
+            
+              {/* Rearrange menu */}
+              {this.state.rearranges[idx] && <div>
+                  <SubheadingRearranger
+                    instrTarget={this.props.instrTarget}
+                    header={this.state.headers[idx].replace(".","@")}
+                  />
+              </div>}
+
+              {/* Add to other roles menu*/}
+              {this.state.addToOthers[idx] && <div>
+                <div className="flex space-x-2 py-2 pb-4">
+                  <div className="my-auto pr-8">
+                    <div className="font-bold">Choose other roles to add this instruction to:</div>
+                    <div className="text-xs">WARNING: This will overwrite any already existing instructions
+                    <br/>with this number in the other roles. Use with caution!</div>
+                  </div>
+
+                  <tr className="grid">
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "AkOM")}/><br/>Auckland OM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "AkPM")}/><br/>Auckland PM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "AkPA")}/><br/>Auckland PA</td>
+                  </tr>
+                  <tr className="grid">
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "WlOM")}/><br/>Wellington OM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "WlPM")}/><br/>Wellington PM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "WlPA")}/><br/>Wellington PA</td>
+                  </tr>
+                  <tr className="grid">
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "RoOM")}/><br/>Rotorua OM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "RoPM")}/><br/>Rotorua PM</td>
+                    <td className="text-center"><input type="checkbox" onClick={() => this.handleCheckboxTick(idx, "RoPA")}/><br/>Rotorua PA</td>
+                  </tr>
+
+                  <div className="my-auto pl-8">
+                    <input className="bg-indigo-300 hover:bg-indigo-400 px-2 rounded-full text-base" type="submit" value="Confirm" onClick={() => this.handleSubmitAddToOthers(idx)}/>
+                  </div>
+                </div>
+              </div>}
+
+              {/* Subheadings */}
               <InstructionElement
                 instrTarget={this.props.instrTarget}
                 loggedIn={this.props.loggedIn}
+                showHeadingEdit={this.state.showHeadingEdit}
                 header={el}
               />
-            </>
+              </>
           ))}
         </div>
       </>

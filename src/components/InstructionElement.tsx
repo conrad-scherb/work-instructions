@@ -34,16 +34,18 @@ class InstructionElement extends React.Component<any, any> {
     if (this.props.header !== '') {
       const selectionRef = firebase.database().ref(this.props.instrTarget + '/' + this.props.header.replace('.',"@"))
       selectionRef.on('value', (snapshot) => {
-        this.setState({subheaders: Object.keys(snapshot.val())})
-        this.setState({renameContents: Object.keys(snapshot.val())})
-        let contents = []
-        for (var key of Object.keys(snapshot.val())) {
-          contents.push(snapshot.val()[key])
+        if (snapshot.val() != null) {
+          this.setState({subheaders: Object.keys(snapshot.val())})
+          this.setState({renameContents: Object.keys(snapshot.val())})
+          let contents = []
+          for (var key of Object.keys(snapshot.val())) {
+            contents.push(snapshot.val()[key])
+          }
+          this.setState({contents: contents})
+          this.setState({editedContents: contents})
+          this.setState({editing: Array(Object.keys(snapshot.val()).length).fill(false)})
+          this.setState({renames: Array(Object.keys(snapshot.val()).length).fill(false)})
         }
-        this.setState({contents: contents})
-        this.setState({editedContents: contents})
-        this.setState({editing: Array(Object.keys(snapshot.val()).length).fill(false)})
-        this.setState({renames: Array(Object.keys(snapshot.val()).length).fill(false)})
       })
     }
   }
@@ -59,12 +61,14 @@ class InstructionElement extends React.Component<any, any> {
 
   updateFirebaseSubheader(idx: any){
     var updates: updates = {}
+    console.log(this.state.subheaders)
     updates[this.props.instrTarget 
       + '/' + this.props.header.replace('.','@')
       + '/' + this.state.subheaders[idx]] = null
     updates[this.props.instrTarget
       + '/' + this.props.header.replace('.','@')
-      + '/' + this.state.renameContents[idx]] = this.state.contents[idx]
+      + '/' + this.state.subheaders[idx].split("@")[0] 
+      + "@ " + this.state.renameContents[idx]] = this.state.contents[idx]
     firebase.database().ref().update(updates)
   }
 
@@ -127,7 +131,7 @@ class InstructionElement extends React.Component<any, any> {
                     {((this.props.header[1] === '.') 
                                           ? this.props.header[0] 
                                           : this.props.header.slice(0,2)) 
-                      + '.' + (idx+1) + ". " + el
+                      + '.' + el.replace("@", ".")
                     }
                   </div>
                 }
@@ -139,7 +143,7 @@ class InstructionElement extends React.Component<any, any> {
                                             : this.props.header.slice(0,2)) 
                         + '.' + (idx+1) + ". "
                       }
-                      <input type="text" value={this.state.value} placeholder={this.state.renameContents[idx]} onChange={(e) => this.handleRenameTextChange(e, idx)} />
+                      <input type="text" value={this.state.value} placeholder={this.state.subheaders[idx].split("@")[1]} onChange={(e) => this.handleRenameTextChange(e, idx)} />
                     </label>
                   </b>
                 }
@@ -147,7 +151,7 @@ class InstructionElement extends React.Component<any, any> {
                   {this.state.editing[idx] &&
                     <input onClick={() => this.handleSaveClick(idx)} className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full" type="submit" value="Save" />
                   }
-                  {this.props.loggedIn &&
+                  {this.props.showHeadingEdit &&
                     <>
                       <input className="bg-yellow-300 hover:bg-yellow-400 px-2 rounded-full" 
                             type="submit" value={this.state.renames[idx] ? "Save rename" : "Rename"} onClick={() => this.handleRenameClick(idx)}/>
@@ -160,9 +164,10 @@ class InstructionElement extends React.Component<any, any> {
                 </div>
               </div>
 
+
               {!this.state.editing[idx] && 
                 <div className="text-sm">
-                  {parse(this.state.contents[idx])}
+                  {parse(typeof(this.state.contents[idx]) == "string" ? this.state.contents[idx] : "Undefined")}
                 </div>
               }
 

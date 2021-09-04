@@ -21,7 +21,7 @@ class RichTextbox extends React.Component<any, any> {
             setDefaultStyle="font-size: 12px;"
             setOptions={{
               height: 150,
-              buttonList: [['font', 'fontSize', 'bold', 'underline', 'italic', 'strike'], ['align', 'fontColor', 'list', 'image'], ['codeView','save']]
+              buttonList: [['font', 'fontSize', 'bold', 'underline', 'italic', 'strike'], ['align', 'fontColor', 'list', 'image', 'table'], ['codeView','save']]
             }}
           />
       )
