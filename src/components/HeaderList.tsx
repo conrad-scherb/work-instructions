@@ -45,8 +45,6 @@ export class HeaderList extends Component<any, BasicClassState> {
   }
 
   componentDidUpdate(prevProps: any) {
-    console.log("Updated")
-
     if (this.props.visible == false && prevProps.visible == true) {
       this.setState({list: []})
       return

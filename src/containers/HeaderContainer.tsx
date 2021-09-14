@@ -20,14 +20,34 @@ async function getHighestSubheadingNum(selectionPath: any) {
       if (keys.length == 0) {
         return resolve(1)
       }
-      let lastKey = keys[keys.length-1]
-      let lastNum = parseInt(lastKey[0])+1
-  
-      return resolve(lastNum)
+      
+      let highest = 0
+      for (let key of keys) {
+        let number = parseInt(key.split("@")[0])
+        highest = Math.max(number, highest)
+      }
+      
+      return resolve(highest+1)
     })
     return reject();
   })
 }
+
+async function removeHeading(path: any, heading: any) {
+  return new Promise<void>(function(resolve, reject) {
+    const ref = firebase.database().ref(path)
+
+    ref.child(heading).once('value').then(function() {
+      var update: any = {};
+      update[heading] = null;
+      console.log("Updating")
+      ref.update(update);
+
+      return resolve()
+    })
+  })
+}
+
 
 class HeaderContainer extends React.Component<any, any> {
   constructor(props: any) {
@@ -38,6 +58,9 @@ class HeaderContainer extends React.Component<any, any> {
       rearranges: [],
       addToOthers: [],
       checkboxes: [],
+      renameContents: [],
+      reloaders: [],
+      renames: [],
       count: 0,
       showHeaders: false,
       showHeadingEdit: false
@@ -68,10 +91,28 @@ class HeaderContainer extends React.Component<any, any> {
 
         this.setState({rearranges: Array(unsortedHeadings.length).fill(false)})
         this.setState({addToOthers: Array(unsortedHeadings.length).fill(false)})
+        this.setState({reloaders: Array(unsortedHeadings.length).fill(false)})
+        this.setState({renames: Array(unsortedHeadings.length).fill(false)})
         this.setState({checkboxes: Array(unsortedHeadings.length).fill([])})
         this.setState({headers: sortedHeadings})
+        this.setState({renameContents: sortedHeadings})
       })
     }
+  }
+
+  handleRenameClick(idx: any) {
+    let renamesCopy = this.state.renames
+    renamesCopy[idx] = !this.state.renames[idx]
+    if (renamesCopy[idx] == false) {
+      //this.updateFirebaseSubheader(idx)
+    }
+    this.setState({renames: renamesCopy})
+  }
+
+  handleRenameTextChange(event: any, idx: any) {
+    let renamesCopy = this.state.renameContents
+    renamesCopy[idx] = event.target.value
+    this.setState({renameContents: renamesCopy});
   }
 
   handleAddClick(idx: any) {
@@ -91,11 +132,14 @@ class HeaderContainer extends React.Component<any, any> {
   handleAddHeadingClick() {
     let newHeading: string = prompt('Enter the new heading name')!;
     var updates: updates = {}
-    updates[this.props.instrTarget 
-            + '/' + "1@ " + newHeading 
-            + '/' + "New instruction"] = "Edit this instruction..."
-    firebase.database().ref().update(updates)
-    this.setState({count: this.state.count + 1})
+
+    getHighestSubheadingNum(this.props.instrTarget).then((lastNum) => {
+      updates[this.props.instrTarget 
+              + '/' + lastNum + "@ " + newHeading 
+              + '/' + "1@ New instruction"] = "Edit this instruction..."
+      firebase.database().ref().update(updates)
+      this.setState({count: this.state.count + 1})
+      })
   }
 
   handleShowEditModeChange() {
@@ -179,10 +223,15 @@ class HeaderContainer extends React.Component<any, any> {
     for (let i of this.state.list) {
       newHeaderOrder.push(i.name)
     }
+
+    console.log(newHeaderOrder)
+
+    let modified = []
     
     for (let i of newHeaderOrder) {
       for (let j in this.state.headers) {
         if (this.state.headers[j].substring(this.state.headers[j].indexOf(" ") + 1) == i) {
+          modified.push(this.state.headers[j])
           var ref = firebase.database().ref(this.props.instrTarget);
           let old = this.state.headers[j].replace('.','@')
           let newPath = count + "@ " + i
@@ -197,6 +246,17 @@ class HeaderContainer extends React.Component<any, any> {
         }
       }
     }
+
+    for (let i of this.state.headers) {
+      if (!modified.includes(i)) {
+        removeHeading(this.props.instrTarget, i.replace(".","@")).then(() => {
+          this.pullFirebase()
+          return
+        })
+      }
+    }
+
+    this.pullFirebase()
   }
   
   // Mounting the container for headers triggers firebase pull
@@ -247,10 +307,21 @@ class HeaderContainer extends React.Component<any, any> {
             <>  
               {/* Heading menu bar */}
               <div className="flex justify-between">
-                <div className="text-3xl font-bold">{el}</div>
+                {!this.state.renames[idx] &&
+                  <div className="text-3xl font-bold">{el}</div>
+                }
+
+                {this.state.renames[idx] && 
+                  <label className="text-3xl font-bold">
+                    {el.split(".")[0]+"."}
+                    <input type="text" style={{width: "500px"}} placeholder={el.split(".")[1]} onChange={(e) => this.handleRenameTextChange(e, idx)}/>
+                  </label>
+                }
+
                 <div className="text-1xl pt-1.5">
                   {this.state.showHeadingEdit &&
                     <div className="flex space-x-2 justify-center">
+                      <input className="bg-yellow-300 hover:bg-yellow-400 px-2 rounded-full" type="submit" value={this.state.renames[idx] ? "Save rename" : "Rename"} onClick={() => this.handleRenameClick(idx)}/>
                       <input className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full text-base" type="submit" value="Rearrange" onClick={() => this.handleRearrangeClick(idx)}/>
                       <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
                       <input className="bg-indigo-300 hover:bg-indigo-400 px-2 rounded-full text-base" type="submit" value="Add to other roles" onClick={() => this.handleAddToOthersClick(idx)}/>

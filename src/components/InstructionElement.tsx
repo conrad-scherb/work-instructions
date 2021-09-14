@@ -35,10 +35,26 @@ class InstructionElement extends React.Component<any, any> {
       const selectionRef = firebase.database().ref(this.props.instrTarget + '/' + this.props.header.replace('.',"@"))
       selectionRef.on('value', (snapshot) => {
         if (snapshot.val() != null) {
-          this.setState({subheaders: Object.keys(snapshot.val())})
-          this.setState({renameContents: Object.keys(snapshot.val())})
+          // Order the subheaders
+          let subheaders = Object.keys(snapshot.val());
+          let sortedSubheaders = []
+
+          for (let subheader of subheaders) {
+            if (subheader.split("@")[0].length == 1) {
+              sortedSubheaders.push(subheader)
+            }
+          }
+
+          for (let subheader of subheaders) {
+            if (subheader.split("@")[0].length == 2) {
+              sortedSubheaders.push(subheader)
+            }
+          }
+
+          this.setState({subheaders: sortedSubheaders})
+          this.setState({renameContents: sortedSubheaders})
           let contents = []
-          for (var key of Object.keys(snapshot.val())) {
+          for (var key of sortedSubheaders) {
             contents.push(snapshot.val()[key])
           }
           this.setState({contents: contents})
@@ -120,6 +136,12 @@ class InstructionElement extends React.Component<any, any> {
     this.pullFirebaseSubheaders()
   }
 
+  componentDidUpdate(prevProps: any) {
+    if (this.props != prevProps) {
+      this.pullFirebaseSubheaders()
+    }
+  }
+
   render() {
     return(
       <div key={this.props.instrTarget} className="pb-4">
@@ -166,7 +188,7 @@ class InstructionElement extends React.Component<any, any> {
 
 
               {!this.state.editing[idx] && 
-                <div className="text-sm">
+                <div className="text-sm leading-6">
                   {parse(typeof(this.state.contents[idx]) == "string" ? this.state.contents[idx] : "Undefined")}
                 </div>
               }
