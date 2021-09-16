@@ -52,7 +52,7 @@ class InstructionElement extends React.Component<any, any> {
           }
 
           this.setState({subheaders: sortedSubheaders})
-          this.setState({renameContents: sortedSubheaders})
+          this.setState({renameContents: JSON.parse(JSON.stringify(sortedSubheaders))})
           let contents = []
           for (var key of sortedSubheaders) {
             contents.push(snapshot.val()[key])
@@ -79,12 +79,12 @@ class InstructionElement extends React.Component<any, any> {
     var updates: updates = {}
     console.log(this.state.subheaders)
     updates[this.props.instrTarget 
-      + '/' + this.props.header.replace('.','@')
+      + '/' + this.props.header.replaceAll('.','@')
       + '/' + this.state.subheaders[idx]] = null
     updates[this.props.instrTarget
       + '/' + this.props.header.replace('.','@')
-      + '/' + this.state.subheaders[idx].split("@")[0] 
-      + "@ " + this.state.renameContents[idx]] = this.state.contents[idx]
+      + '/' + this.state.subheaders[idx].split("@")[0].replaceAll(".","@")
+      + "@ " + this.state.renameContents[idx].replaceAll(".","@")] = this.state.contents[idx]
     firebase.database().ref().update(updates)
   }
 
@@ -129,6 +129,8 @@ class InstructionElement extends React.Component<any, any> {
     let renamesCopy = this.state.renameContents
     renamesCopy[idx] = event.target.value
     this.setState({renameContents: renamesCopy});
+    console.log(this.state.renameContents)
+    console.log(this.state.subheaders)
   }
 
   // Mounting the container for headers triggers firebase pull
@@ -153,7 +155,7 @@ class InstructionElement extends React.Component<any, any> {
                     {((this.props.header[1] === '.') 
                                           ? this.props.header[0] 
                                           : this.props.header.slice(0,2)) 
-                      + '.' + el.replace("@", ".")
+                      + '.' + el.replaceAll("@", ".")
                     }
                   </div>
                 }

@@ -104,14 +104,25 @@ class HeaderContainer extends React.Component<any, any> {
     let renamesCopy = this.state.renames
     renamesCopy[idx] = !this.state.renames[idx]
     if (renamesCopy[idx] == false) {
-      //this.updateFirebaseSubheader(idx)
+      this.updateFirebaseHeader(idx)
     }
     this.setState({renames: renamesCopy})
   }
 
+  updateFirebaseHeader(idx: any){
+    const selectionRef = firebase.database().ref(this.props.instrTarget)
+    selectionRef.child(this.state.headers[idx].replace('.','@')).once('value').then((snap) => {
+      let data = snap.val()
+      let updates: updates = {}
+      updates[this.state.headers[idx].replace('.',"@")] = null
+      updates[this.state.renameContents[idx].replace('.',"@")] = data;
+      selectionRef.update(updates);
+    })
+  }
+
   handleRenameTextChange(event: any, idx: any) {
     let renamesCopy = this.state.renameContents
-    renamesCopy[idx] = event.target.value
+    renamesCopy[idx] = renamesCopy[idx].split(".")[0] + ". " + event.target.value;
     this.setState({renameContents: renamesCopy});
   }
 
@@ -311,11 +322,12 @@ class HeaderContainer extends React.Component<any, any> {
                   <div className="text-3xl font-bold">{el}</div>
                 }
 
-                {this.state.renames[idx] && 
+
+                {/*this.state.renames[idx] && 
                   <label className="text-3xl font-bold">
                     {el.split(".")[0]+"."}
                     <input type="text" style={{width: "500px"}} placeholder={el.split(".")[1]} onChange={(e) => this.handleRenameTextChange(e, idx)}/>
-                  </label>
+                  </label>*/
                 }
 
                 <div className="text-1xl pt-1.5">
