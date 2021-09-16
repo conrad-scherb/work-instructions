@@ -3,7 +3,7 @@ import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
 import InstructionElement from '../components/InstructionElement';
 import HeaderList from '../components/HeaderList';
-import { ReactSortable } from "react-sortablejs";
+import { scroller } from "react-scroll"
 import { SubheadingRearranger } from '../components/SubheadingRearranger';
 
 
@@ -40,7 +40,6 @@ async function removeHeading(path: any, heading: any) {
     ref.child(heading).once('value').then(function() {
       var update: any = {};
       update[heading] = null;
-      console.log("Updating")
       ref.update(update);
 
       return resolve()
@@ -95,7 +94,7 @@ class HeaderContainer extends React.Component<any, any> {
         this.setState({renames: Array(unsortedHeadings.length).fill(false)})
         this.setState({checkboxes: Array(unsortedHeadings.length).fill([])})
         this.setState({headers: sortedHeadings})
-        this.setState({renameContents: sortedHeadings})
+        this.setState({renameContents: JSON.parse(JSON.stringify(sortedHeadings))})
       })
     }
   }
@@ -114,8 +113,11 @@ class HeaderContainer extends React.Component<any, any> {
     selectionRef.child(this.state.headers[idx].replace('.','@')).once('value').then((snap) => {
       let data = snap.val()
       let updates: updates = {}
+      console.log(this.state.headers[idx].replace('.',"@"))
+      console.log(this.state.renameContents[idx].replace(".","@"))
       updates[this.state.headers[idx].replace('.',"@")] = null
       updates[this.state.renameContents[idx].replace('.',"@")] = data;
+      console.log(updates)
       selectionRef.update(updates);
     })
   }
@@ -123,6 +125,7 @@ class HeaderContainer extends React.Component<any, any> {
   handleRenameTextChange(event: any, idx: any) {
     let renamesCopy = this.state.renameContents
     renamesCopy[idx] = renamesCopy[idx].split(".")[0] + ". " + event.target.value;
+    console.log(this.state.renameContents)
     this.setState({renameContents: renamesCopy});
   }
 
@@ -312,22 +315,31 @@ class HeaderContainer extends React.Component<any, any> {
             </>
           }
         </div>
-        
+
         <div key={this.props.instrTarget} className="text-left px-20 pt-4">
+          {/* Contents */}
+          <div>
+            {this.state.headers.length != 0 && <div className="text-3xl pb-2 font-bold">Contents</div>}
+            {this.state.headers.map((el: any, idx: any) => (
+              <div className="flex py-0.5" onClick={() => scroller.scrollTo(el.split(".")[0])}>
+                <div className="hover:underline">{el}</div>
+              </div>
+            ))}
+          </div>
+
           {this.state.headers.map((el: any, idx: any) => (
             <>  
               {/* Heading menu bar */}
-              <div className="flex justify-between">
+              <div className={el.split(".")[0] + " flex justify-between pt-2"}>
                 {!this.state.renames[idx] &&
                   <div className="text-3xl font-bold">{el}</div>
                 }
 
-
-                {/*this.state.renames[idx] && 
+                {this.state.renames[idx] && 
                   <label className="text-3xl font-bold">
                     {el.split(".")[0]+"."}
-                    <input type="text" style={{width: "500px"}} placeholder={el.split(".")[1]} onChange={(e) => this.handleRenameTextChange(e, idx)}/>
-                  </label>*/
+                    <input type="text" value={this.state.value} style={{width: "500px"}} placeholder={el.split(".")[1]} onChange={(e) => this.handleRenameTextChange(e, idx)}/>
+                  </label>
                 }
 
                 <div className="text-1xl pt-1.5">
