@@ -9,6 +9,7 @@ class MainContainer extends React.Component<any, any> {
     super(props);
     this.state = {
       loggedIn: false,
+      admin: false,
       password: '',
       branch: '',
       role: '',
@@ -25,6 +26,9 @@ class MainContainer extends React.Component<any, any> {
   handleSubmit(event: any) {
     if (this.state.password.value === "escapefromlevel11") {
       this.setState({loggedIn: true})
+    } else if (this.state.password.value === "escapemanager") {
+      this.setState({loggedIn: true})
+      this.setState({admin: true})
     } else {
       alert("That password is incorrect!")
     }
@@ -65,6 +69,7 @@ class MainContainer extends React.Component<any, any> {
           <HeaderContainer
             instrTarget={this.state.instrTarget}
             loggedIn={this.state.loggedIn}
+            admin={this.state.admin}
           />
         </div>
       )

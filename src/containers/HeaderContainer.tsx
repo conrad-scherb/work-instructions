@@ -3,6 +3,7 @@ import "../styles/tailwind.output.css"
 import firebase from "../firebase/Firebase"
 import InstructionElement from '../components/InstructionElement';
 import HeaderList from '../components/HeaderList';
+//@ts-nocheck
 import { scroller } from "react-scroll"
 import { SubheadingRearranger } from '../components/SubheadingRearranger';
 
@@ -294,11 +295,11 @@ class HeaderContainer extends React.Component<any, any> {
         <div className="center pt-0.5">
           {this.props.loggedIn && 
             <>
-              <div className="pb-0.5">
+              {/*<div className="pb-0.5">
                 <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Edit mode on/off" onClick={() => this.handleShowEditModeChange()}/>
-              </div>
+              </div>*/}
 
-              {this.state.showHeadingEdit && 
+              {this.props.admin && 
                 <>
                   <div className="flex space-x-2 justify-center">
                     <input className="bg-pink-300 hover:bg-pink-400 px-2 rounded-full text-base" type="submit" value="Add heading" onClick={() => this.handleAddHeadingClick()}/>
@@ -310,7 +311,7 @@ class HeaderContainer extends React.Component<any, any> {
               <HeaderList
                 headers={this.state.headers}
                 passUpListOrder={this.passUpListOrder}
-                visible={this.state.showHeadingEdit}
+                visible={this.props.admin}
               />    
             </>
           }
@@ -321,7 +322,11 @@ class HeaderContainer extends React.Component<any, any> {
           <div>
             {this.state.headers.length != 0 && <div className="text-3xl pb-2 font-bold">Contents</div>}
             {this.state.headers.map((el: any, idx: any) => (
-              <div className="flex py-0.5" onClick={() => scroller.scrollTo(el.split(".")[0])}>
+              <div className="flex py-0.5" onClick={() => scroller.scrollTo(el.split(".")[0], {
+                duration: 800,
+                delay: 0,
+                smooth: "easeInOutQuart",
+              })}>
                 <div className="hover:underline">{el}</div>
               </div>
             ))}
@@ -343,12 +348,14 @@ class HeaderContainer extends React.Component<any, any> {
                 }
 
                 <div className="text-1xl pt-1.5">
-                  {this.state.showHeadingEdit &&
+                  {this.props.admin &&
                     <div className="flex space-x-2 justify-center">
                       <input className="bg-yellow-300 hover:bg-yellow-400 px-2 rounded-full" type="submit" value={this.state.renames[idx] ? "Save rename" : "Rename"} onClick={() => this.handleRenameClick(idx)}/>
                       <input className="bg-purple-300 hover:bg-purple-400 px-2 rounded-full text-base" type="submit" value="Rearrange" onClick={() => this.handleRearrangeClick(idx)}/>
                       <input className="bg-green-300 hover:bg-green-400 px-2 rounded-full text-base" type="submit" value="Add" onClick={() => this.handleAddClick(idx)}/>
-                      <input className="bg-indigo-300 hover:bg-indigo-400 px-2 rounded-full text-base" type="submit" value="Add to other roles" onClick={() => this.handleAddToOthersClick(idx)}/>
+                      {/*
+                        input className="bg-indigo-300 hover:bg-indigo-400 px-2 rounded-full text-base" type="submit" value="Add to other roles" onClick={() => this.handleAddToOthersClick(idx)}/>
+                      */}
                     </div>
                   }
                 </div>
@@ -397,7 +404,7 @@ class HeaderContainer extends React.Component<any, any> {
               <InstructionElement
                 instrTarget={this.props.instrTarget}
                 loggedIn={this.props.loggedIn}
-                showHeadingEdit={this.state.showHeadingEdit}
+                showHeadingEdit={this.props.admin}
                 header={el}
               />
               </>
